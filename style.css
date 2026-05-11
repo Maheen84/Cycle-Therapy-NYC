@@ -417,7 +417,7 @@ nav.scrolled {
   will-change: transform, translate, box-shadow; /* GPU layer */
   translate: 0 0;
   /* Transition translate instead of transform to not conflict with animation */
-  transition: translate 0.4s ease, box-shadow 0.4s ease;
+  transition: translate 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
   animation: floating 6s ease-in-out infinite;
 }
 
@@ -434,10 +434,8 @@ nav.scrolled {
 
 .testimonial-card:hover {
   translate: 0 -20px;
-  box-shadow: 0 15px 35px rgba(232, 73, 29, 0.35),
-              0 0 0 1px rgba(232, 73, 29, 0.5);
-  /* Removed transform !important.
-     The card will now rise up smoothly via translate and continue floating! */
+  box-shadow: 0 10px 30px rgba(232, 73, 29, 0.4);
+  border-color: #e8491d;
 }
 
 .testimonial-card p {
