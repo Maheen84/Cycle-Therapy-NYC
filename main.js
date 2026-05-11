@@ -73,133 +73,92 @@ if (contactForm) {
     });
 }
 
-// Anti-Gravity Testimonials Carousel (Group Sliding)
-document.addEventListener('DOMContentLoaded', () => {
-    const track = document.querySelector('.carousel-track');
-    const cards = Array.from(document.querySelectorAll('.testimonial-card'));
-    const dotsContainer = document.querySelector('.carousel-dots');
-    
-    if (!track || cards.length === 0) return;
+// ─── Anti-Gravity Testimonials Carousel ───────────────────────────────────────
+// Note: <script type="module"> is already deferred, so we don't need
+// DOMContentLoaded. Instead we use a simple init guard.
+(function initCarousel() {
+    const track        = document.querySelector('.carousel-track');
+    const dotsWrap     = document.querySelector('.carousel-dots');
+    if (!track || !dotsWrap) return;
 
-    let currentPage = 0;
-    let autoPlayInterval;
-    let isTransitioning = false;
+    const cards        = Array.from(track.querySelectorAll('.testimonial-card'));
+    if (cards.length === 0) return;
 
-    function initDots() {
-        dotsContainer.innerHTML = '';
-        const isDesktop = window.innerWidth > 992;
-        const numPages = isDesktop ? 2 : cards.length;
-        
-        for (let i = 0; i < numPages; i++) {
-            const dot = document.createElement('div');
-            dot.classList.add('dot');
-            if (i === 0) dot.classList.add('active');
-            dot.addEventListener('click', () => {
-                if (isTransitioning) return;
-                goToPage(i);
-                resetAutoPlay();
-            });
-            dotsContainer.appendChild(dot);
-        }
+    // ── State ──────────────────────────────────────────────────────────────────
+    let current  = 0;   // current page index
+    let timer    = null;
+    const GAP    = 30;  // matches CSS gap
+
+    // ── Helpers ────────────────────────────────────────────────────────────────
+    function numPages() {
+        return window.innerWidth > 992 ? 2 : cards.length;
     }
 
-    function goToPage(page) {
-        if (isTransitioning) return;
-        isTransitioning = true;
-        
-        const isDesktop = window.innerWidth > 992;
-        const numPages = isDesktop ? 2 : cards.length;
-        currentPage = page % numPages;
+    function slideTo(page) {
+        const pages = numPages();
+        current = ((page % pages) + pages) % pages;   // safe modulo
 
-        // Start Drift Transition (Float up and fade out)
-        track.classList.add('transitioning');
-        
-        setTimeout(() => {
-            const container = document.querySelector('.carousel-container');
-            const containerWidth = container.offsetWidth;
-            const cardWidth = cards[0].offsetWidth;
-            const gap = 30;
-            
-            let offset = 0;
+        const cardW       = cards[0].getBoundingClientRect().width;
+        const containerW  = track.parentElement.offsetWidth;
+        let offset = 0;
 
-            if (isDesktop) {
-                // Update Page Classes for Visibility
-                track.classList.remove('page-1-active', 'page-2-active');
-                track.classList.add(currentPage === 0 ? 'page-1-active' : 'page-2-active');
-
-                if (currentPage === 0) {
-                    offset = 0;
-                } else {
-                    const card4Start = 3 * (cardWidth + gap);
-                    const card4Center = card4Start + (cardWidth / 2);
-                    offset = card4Center - (containerWidth / 2);
-                }
+        if (window.innerWidth > 992) {
+            if (current === 0) {
+                offset = 0;
             } else {
-                offset = currentPage * (cardWidth + gap);
+                // Center the 4th card in the viewport
+                const card4Left = 3 * (cardW + GAP);
+                offset = card4Left - (containerW / 2 - cardW / 2);
             }
+        } else {
+            offset = current * (cardW + GAP);
+        }
 
-            track.style.transform = `translateX(-${offset}px)`;
-            
-            // Finish Drift Transition (Drift down)
-            track.classList.remove('transitioning');
-            track.classList.add('drifting-down');
+        track.style.transform = `translateX(-${offset}px)`;
 
-            // Update Dots
-            const dots = document.querySelectorAll('.dot');
-            dots.forEach((dot, index) => {
-                dot.classList.toggle('active', index === currentPage);
-            });
-
-            setTimeout(() => {
-                track.classList.remove('drifting-down');
-                isTransitioning = false;
-            }, 600);
-        }, 400);
+        // Update dots
+        document.querySelectorAll('.dot').forEach((d, i) => {
+            d.classList.toggle('active', i === current);
+        });
     }
 
-    function startAutoPlay() {
-        if (autoPlayInterval) clearInterval(autoPlayInterval);
-        autoPlayInterval = setInterval(() => {
-            if (isTransitioning) return;
-            const isDesktop = window.innerWidth > 992;
-            const numPages = isDesktop ? 2 : cards.length;
-            goToPage((currentPage + 1) % numPages);
-        }, 4000);
-    }
-
-    function stopAutoPlay() {
-        if (autoPlayInterval) {
-            clearInterval(autoPlayInterval);
-            autoPlayInterval = null;
+    // ── Dots ───────────────────────────────────────────────────────────────────
+    function buildDots() {
+        dotsWrap.innerHTML = '';
+        for (let i = 0; i < numPages(); i++) {
+            const d = document.createElement('div');
+            d.className = 'dot' + (i === 0 ? ' active' : '');
+            d.addEventListener('click', () => { slideTo(i); resetTimer(); });
+            dotsWrap.appendChild(d);
         }
     }
 
-    function resetAutoPlay() {
-        stopAutoPlay();
-        startAutoPlay();
+    // ── Auto-play ──────────────────────────────────────────────────────────────
+    function startTimer() {
+        stopTimer();
+        timer = setInterval(() => slideTo(current + 1), 4000);
     }
 
-    // Hover logic - Use the container to ensure it covers the whole area
+    function stopTimer() {
+        if (timer) { clearInterval(timer); timer = null; }
+    }
+
+    function resetTimer() { stopTimer(); startTimer(); }
+
+    // ── Hover pause ────────────────────────────────────────────────────────────
     const container = document.querySelector('.carousel-container');
-    container.addEventListener('mouseenter', () => {
-        stopAutoPlay();
-    });
-    
-    container.addEventListener('mouseleave', () => {
-        startAutoPlay();
-    });
+    container.addEventListener('mouseenter', stopTimer);
+    container.addEventListener('mouseleave', startTimer);
 
-    // Initial Start
-    initDots();
-    track.classList.add('page-1-active');
-    startAutoPlay();
+    // ── Boot ───────────────────────────────────────────────────────────────────
+    buildDots();
+    slideTo(0);
+    startTimer();
 
-    // Handle Resize
-    let resizeTimer;
+    // Rebuild on resize (debounced)
+    let resizeTO;
     window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-            location.reload(); // Reload is necessary to recalculate offsets properly
-        }, 250);
+        clearTimeout(resizeTO);
+        resizeTO = setTimeout(() => { buildDots(); slideTo(0); }, 300);
     });
-});
+}());

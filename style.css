@@ -473,27 +473,7 @@ nav.scrolled {
   animation: floating 6s ease-in-out infinite;
 }
 
-/* Drifting Transition Effect */
-.carousel-track.transitioning .testimonial-card {
-  opacity: 0;
-  transform: translateY(-40px);
-}
-
-.carousel-track.drifting-down .testimonial-card {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Hide non-group cards on Page 2 */
-.page-2-active .testimonial-card:not(:nth-child(4)) {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.page-1-active .testimonial-card:nth-child(4) {
-  opacity: 0;
-  pointer-events: none;
-}
+/* Drifting Transition Effect — removed (conflicted with float animation) */
 
 .carousel-dots {
   display: flex;
