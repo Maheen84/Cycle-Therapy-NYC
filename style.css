@@ -414,10 +414,10 @@ nav.scrolled {
   justify-content: space-between;
   min-height: 280px;
   position: relative;
-  will-change: transform;                 /* GPU layer — prevents repaint flicker */
-  /* Only transition the two properties we actually change on hover.
-     'transition: all' is banned — it causes layout-affecting props to animate. */
-  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  will-change: transform, translate, box-shadow; /* GPU layer */
+  translate: 0 0;
+  /* Transition translate instead of transform to not conflict with animation */
+  transition: translate 0.4s ease, box-shadow 0.4s ease;
   animation: floating 6s ease-in-out infinite;
 }
 
@@ -433,11 +433,11 @@ nav.scrolled {
 }
 
 .testimonial-card:hover {
-  transform: translateY(-20px) !important;
+  translate: 0 -20px;
   box-shadow: 0 15px 35px rgba(232, 73, 29, 0.35),
               0 0 0 1px rgba(232, 73, 29, 0.5);
-  /* No animation-play-state:paused — pausing mid-float caused a jump.
-     The !important transform already overrides the float animation smoothly. */
+  /* Removed transform !important.
+     The card will now rise up smoothly via translate and continue floating! */
 }
 
 .testimonial-card p {
