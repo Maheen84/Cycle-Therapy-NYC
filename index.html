@@ -24,9 +24,24 @@
         <a href="#" class="logo">CYCLE THERAPY<span>NYC</span></a>
         <ul class="nav-links">
             <li><a href="#home">Home</a></li>
-            <li><a href="#services">Services</a></li>
+            <li>
+                <a href="#inventory">Showroom <i class="fas fa-chevron-down"></i></a>
+                <div class="dropdown">
+                    <a href="#inventory">New Inventory</a>
+                    <a href="#inventory">Pre-Owned</a>
+                    <a href="#contact">Sell Your Bike</a>
+                </div>
+            </li>
+            <li>
+                <a href="#services">Service <i class="fas fa-chevron-down"></i></a>
+                <div class="dropdown">
+                    <a href="#services">Repairs</a>
+                    <a href="#services">Tune-ups</a>
+                    <a href="#services">Storage</a>
+                    <a href="#services">Apparel</a>
+                </div>
+            </li>
             <li><a href="#about">About</a></li>
-            <li><a href="#testimonials">Reviews</a></li>
             <li><a href="#contact">Contact</a></li>
         </ul>
         <div class="mobile-menu-btn">
@@ -40,45 +55,111 @@
             <h1>RIDE HARD. <br><span style="color: var(--accent);">STAY READY.</span></h1>
             <p>Harlem's destination for high-performance motorcycle repair, scooter tune-ups, and expert engine diagnostics. We keep the city's riders on the road.</p>
             <div class="hero-btns">
-                <a href="#services" class="btn btn-primary">Our Services</a>
+                <a href="#inventory" class="btn btn-primary">View Inventory</a>
                 <a href="#contact" class="btn btn-outline">Book a Service</a>
             </div>
         </div>
     </section>
 
+    <!-- Featured Inventory Section -->
+    <section id="inventory" class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;">
+            <h2 class="section-title reveal" style="margin-bottom: 0;">Featured Inventory</h2>
+            <a href="#contact" class="btn btn-outline reveal">+ See More</a>
+        </div>
+        <div class="inventory-grid">
+            <div class="inventory-card reveal">
+                <div class="inventory-img" style="background-image: url('https://images.unsplash.com/photo-1558981285-6f0c94958bb6?auto=format&fit=crop&q=80&w=600');">
+                    <span class="inventory-year">2014</span>
+                </div>
+                <div class="inventory-info">
+                    <h3>Yamaha V Star Custom 650</h3>
+                    <div class="inventory-price">$4,499</div>
+                    <a href="#contact" class="btn btn-outline" style="width: 100%; text-align: center;">See More</a>
+                </div>
+            </div>
+            <div class="inventory-card reveal">
+                <div class="inventory-img" style="background-image: url('https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&q=80&w=600');">
+                    <span class="inventory-year">2004</span>
+                </div>
+                <div class="inventory-info">
+                    <h3>Yamaha YZ 250F</h3>
+                    <div class="inventory-price">$2,999</div>
+                    <a href="#contact" class="btn btn-outline" style="width: 100%; text-align: center;">See More</a>
+                </div>
+            </div>
+            <div class="inventory-card reveal">
+                <div class="inventory-img" style="background-image: url('https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?auto=format&fit=crop&q=80&w=600');">
+                    <span class="inventory-year">2017</span>
+                </div>
+                <div class="inventory-info">
+                    <h3>Harley Davidson FLHR Road King</h3>
+                    <div class="inventory-price">$12,699</div>
+                    <a href="#contact" class="btn btn-outline" style="width: 100%; text-align: center;">See More</a>
+                </div>
+            </div>
+            <div class="inventory-card reveal">
+                <div class="inventory-img" style="background-image: url('https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=600');">
+                    <span class="inventory-year">2009</span>
+                </div>
+                <div class="inventory-info">
+                    <h3>BMW K 1300 S</h3>
+                    <div class="inventory-price">$7,299</div>
+                    <a href="#contact" class="btn btn-outline" style="width: 100%; text-align: center;">See More</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Services Section -->
-    <section id="services" class="container">
-        <h2 class="section-title reveal">Moto Expertise</h2>
-        <div class="services-grid">
-            <div class="service-card reveal">
-                <i class="fas fa-motorcycle"></i>
-                <h3>Motorcycle Repairs</h3>
-                <p>From frame work to electrical systems. Our certified mechanics handle every repair with precision and care for all makes and models.</p>
+    <section id="services" style="background: var(--secondary);">
+        <div class="container">
+            <h2 class="section-title reveal">Moto Expertise</h2>
+            <div class="services-grid">
+                <div class="service-card reveal">
+                    <i class="fas fa-motorcycle"></i>
+                    <h3>Motorcycle Repairs</h3>
+                    <p>From frame work to electrical systems. Our certified mechanics handle every repair with precision and care for all makes and models.</p>
+                </div>
+                <div class="service-card reveal">
+                    <i class="fas fa-moped"></i>
+                    <h3>Scooter Tune-ups</h3>
+                    <p>Keep your scooter running efficiently with our comprehensive maintenance packages designed for the urban commute.</p>
+                </div>
+                <div class="service-card reveal">
+                    <i class="fas fa-microchip"></i>
+                    <h3>Engine Diagnostics</h3>
+                    <p>Advanced diagnostic tools to identify and resolve performance issues quickly, ensuring your engine runs at peak performance.</p>
+                </div>
+                <div class="service-card reveal">
+                    <i class="fas fa-snowflake"></i>
+                    <h3>Climate Controlled Storage</h3>
+                    <p>Secure, heated, and climate-controlled storage for your motorcycle or scooter. Includes winterization services.</p>
+                </div>
+                <div class="service-card reveal">
+                    <i class="fas fa-helmet-safety"></i>
+                    <h3>Apparel & Gear</h3>
+                    <p>Authorized dealer for Shoei, Sidi, and Cortech. Over 200 helmets on display along with jackets, gloves, and boots.</p>
+                </div>
+                <div class="service-card reveal">
+                    <i class="fas fa-box-open"></i>
+                    <h3>Parts & Accessories</h3>
+                    <p>A curated selection of premium parts, riding gear, and accessories from the industry's most trusted brands.</p>
+                </div>
             </div>
-            <div class="service-card reveal">
-                <i class="fas fa-moped"></i>
-                <h3>Scooter Tune-ups</h3>
-                <p>Keep your scooter running efficiently with our comprehensive maintenance packages designed for the urban commute.</p>
-            </div>
-            <div class="service-card reveal">
-                <i class="fas fa-microchip"></i>
-                <h3>Engine Diagnostics</h3>
-                <p>Advanced diagnostic tools to identify and resolve performance issues quickly, ensuring your engine runs at peak performance.</p>
-            </div>
-            <div class="service-card reveal">
-                <i class="fas fa-gauge-high"></i>
-                <h3>Brake & Suspension</h3>
-                <p>Safety is paramount. We provide expert brake servicing and suspension tuning for a smoother, safer ride.</p>
-            </div>
-            <div class="service-card reveal">
-                <i class="fas fa-wrench"></i>
-                <h3>Custom Builds</h3>
-                <p>Dreaming of a unique ride? We specialize in performance modifications and custom builds tailored to your vision.</p>
-            </div>
-            <div class="service-card reveal">
-                <i class="fas fa-box-open"></i>
-                <h3>Parts & Accessories</h3>
-                <p>A curated selection of premium parts, riding gear, and accessories from the industry's most trusted brands.</p>
+
+            <!-- Brand Badges -->
+            <div class="brands-grid reveal">
+                <div class="brand-badge">APRILIA</div>
+                <div class="brand-badge">BMW</div>
+                <div class="brand-badge">DUCATI</div>
+                <div class="brand-badge">HARLEY-DAVIDSON</div>
+                <div class="brand-badge">HONDA</div>
+                <div class="brand-badge">KAWASAKI</div>
+                <div class="brand-badge">SUZUKI</div>
+                <div class="brand-badge">TRIUMPH</div>
+                <div class="brand-badge">VESPA</div>
+                <div class="brand-badge">YAMAHA</div>
             </div>
         </div>
     </section>
@@ -91,11 +172,11 @@
             </div>
             <div class="about-content">
                 <h2 class="section-title">Harlem's Moto Hub</h2>
-                <p>Located in the heart of Harlem, Cycle Therapy NYC is more than just a repair shop—it's a sanctuary for the two-wheeled community. We understand that your motorcycle or scooter isn't just a vehicle; it's your lifeline to the city.</p>
+                <p>Located in the heart of Harlem since 1993, Cycle Therapy NYC is a 20,000 square foot, five-floor facility. We are more than just a repair shop—we are the largest motorcycle facility in the New York City area.</p>
                 <br>
-                <p>With decades of combined experience, our mechanics bring specialized expertise to every job, from vintage restorations to modern performance tuning. We pride ourselves on transparent pricing and rapid turnaround.</p>
+                <p>From vintage restorations to modern performance tuning, our team brings specialized expertise to every job. We feature an in-house dynamometer for precise horsepower and torque measurements.</p>
                 <br>
-                <a href="#contact" class="btn btn-primary">Visit the Shop</a>
+                <a href="#contact" class="btn btn-primary">Visit the Showroom</a>
             </div>
         </div>
     </section>
@@ -180,6 +261,7 @@
             <div class="logo" style="margin-bottom: 30px;">CYCLE THERAPY<span>NYC</span></div>
             <ul class="footer-links">
                 <li><a href="#home">Home</a></li>
+                <li><a href="#inventory">Showroom</a></li>
                 <li><a href="#services">Services</a></li>
                 <li><a href="#about">About</a></li>
                 <li><a href="#contact">Contact</a></li>
