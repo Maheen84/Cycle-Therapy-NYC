@@ -73,58 +73,66 @@ if (contactForm) {
     });
 }
 
-// ─── Anti-Gravity Testimonials Carousel (Silent Infinite Loop) ────────────────
+// ─── Anti-Gravity Testimonials Carousel (Seamless Infinite Clone) ─────────────
 (function initCarousel() {
     const track = document.querySelector('.carousel-track');
     if (!track) return;
 
-    // Original cards (3 reviews)
     const originals = Array.from(track.querySelectorAll('.testimonial-card'));
     if (originals.length === 0) return;
 
-    const N   = originals.length; // 3
-    const GAP = 30;
+    const N          = originals.length;  // 3
+    const GAP        = 30;
+    const TRANSITION = 'transform 1.4s cubic-bezier(0.65, 0, 0.35, 1)';
 
-    // ── Clone all cards and append for seamless loop ───────────────────────────
-    // Track becomes: [1, 2, 3, clone1, clone2, clone3]
-    originals.forEach(card => {
+    // Animation delays that match the CSS nth-child rules exactly.
+    // Clones must share the SAME delay as their original so their float
+    // phase is identical — otherwise the instant position-reset is visible.
+    const DELAYS = ['0s', '1.2s', '2.4s'];
+
+    // Append clones with matching animation-delay
+    originals.forEach((card, i) => {
         const clone = card.cloneNode(true);
         clone.setAttribute('aria-hidden', 'true');
+        clone.style.animationDelay = DELAYS[i];  // ← the critical fix
         track.appendChild(clone);
     });
+    // Track is now: [Real1, Real2, Real3, Clone1, Clone2, Clone3]
 
-    // ── State ─────────────────────────────────────────────────────────────────
-    let current = 0;
-    let timer   = null;
-    let jumping = false;
+    let current   = 0;
+    let timer     = null;
+    let isJumping = false;
 
-    // ── Slide to card index ───────────────────────────────────────────────────
-    function slideTo(idx, animate) {
+    // ── Move track ────────────────────────────────────────────────────────────
+    function goTo(idx, animated) {
         const cardW = originals[0].getBoundingClientRect().width;
-        track.style.transition = animate
-            ? 'transform 1.4s cubic-bezier(0.65, 0, 0.35, 1)'
-            : 'none';
-        track.style.transform = `translateX(-${idx * (cardW + GAP)}px)`;
+        track.style.transition = animated ? TRANSITION : 'none';
+        track.style.transform  = `translateX(-${idx * (cardW + GAP)}px)`;
         current = idx;
     }
 
-    // After each animated slide, if we've hit a clone, silently jump back
-    track.addEventListener('transitionend', () => {
-        if (jumping) return;
+    // After each animated slide: if we're on a clone, silently reset to the
+    // matching real card. Position looks identical → user sees nothing.
+    track.addEventListener('transitionend', (e) => {
+        if (e.propertyName !== 'transform') return;  // ignore other props
+        if (isJumping) return;
+
         if (current >= N) {
-            jumping = true;
-            slideTo(current - N, false);
-            requestAnimationFrame(() => requestAnimationFrame(() => {
-                jumping = false;
-            }));
+            isJumping = true;
+            goTo(current - N, false);          // instant, invisible reset
+            requestAnimationFrame(() =>
+                requestAnimationFrame(() => {  // wait 2 frames to be safe
+                    isJumping = false;
+                })
+            );
         }
     });
 
-    // ── Auto-play: advance one card every 4 seconds ───────────────────────────
+    // ── Auto-play ─────────────────────────────────────────────────────────────
     function startTimer() {
         stopTimer();
         timer = setInterval(() => {
-            if (!jumping) slideTo(current + 1, true);
+            if (!isJumping) goTo(current + 1, true);
         }, 4000);
     }
 
@@ -138,13 +146,12 @@ if (contactForm) {
     container.addEventListener('mouseleave', startTimer);
 
     // ── Boot ──────────────────────────────────────────────────────────────────
-    slideTo(0, false);
+    goTo(0, false);
     startTimer();
 
-    // Re-sync offset on resize
     let resizeTO;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTO);
-        resizeTO = setTimeout(() => slideTo(current, false), 300);
+        resizeTO = setTimeout(() => goTo(current, false), 300);
     });
 }());
