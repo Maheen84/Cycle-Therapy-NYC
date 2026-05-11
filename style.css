@@ -401,7 +401,7 @@ nav.scrolled {
 }
 
 .testimonial-card {
-  min-width: calc(33.333% - 20px);
+  min-width: 100%;
   flex-shrink: 0;
   background: var(--glass);
   padding: 40px;
@@ -409,19 +409,16 @@ nav.scrolled {
   font-style: italic;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-height: 250px;
 }
 
-@media (max-width: 992px) {
-  .testimonial-card {
-    min-width: calc(50% - 15px);
-  }
-}
-
-@media (max-width: 768px) {
-  .testimonial-card {
-    min-width: 100%;
-  }
+.carousel-track {
+  display: flex;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  gap: 0; /* Remove gap for single card layout */
 }
 
 .testimonial-author {

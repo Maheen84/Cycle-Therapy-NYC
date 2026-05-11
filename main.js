@@ -73,27 +73,27 @@ if (contactForm) {
     });
 }
 
-// Testimonials Carousel (Infinite Loop)
+// Testimonials Carousel (Infinite Loop - Single Card)
 document.addEventListener('DOMContentLoaded', () => {
     const track = document.querySelector('.carousel-track');
-    const cards = Array.from(document.querySelectorAll('.testimonial-card'));
+    const originalCards = Array.from(document.querySelectorAll('.testimonial-card'));
     const dotsContainer = document.querySelector('.carousel-dots');
     
-    if (!track || cards.length === 0) return;
+    if (!track || originalCards.length === 0) return;
 
     // Clone first and last cards for seamless loop
-    const firstClone = cards[0].cloneNode(true);
-    const lastClone = cards[cards.length - 1].cloneNode(true);
+    const firstClone = originalCards[0].cloneNode(true);
+    const lastClone = originalCards[originalCards.length - 1].cloneNode(true);
     
     track.appendChild(firstClone);
-    track.insertBefore(lastClone, cards[0]);
+    track.insertBefore(lastClone, originalCards[0]);
 
     const allCards = document.querySelectorAll('.testimonial-card');
     let currentIndex = 1; // Start at the first original card
     let isTransitioning = false;
 
     // Create dots (only for original cards)
-    cards.forEach((_, i) => {
+    originalCards.forEach((_, i) => {
         const dot = document.createElement('div');
         dot.classList.add('dot');
         if (i === 0) dot.classList.add('active');
@@ -108,8 +108,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateDots(index) {
         let dotIndex = index - 1;
-        if (index === 0) dotIndex = cards.length - 1;
-        if (index === cards.length + 1) dotIndex = 0;
+        if (index === 0) dotIndex = originalCards.length - 1;
+        if (index === originalCards.length + 1) dotIndex = 0;
         
         dots.forEach(dot => dot.classList.remove('active'));
         if (dots[dotIndex]) dots[dotIndex].classList.add('active');
@@ -121,9 +121,8 @@ document.addEventListener('DOMContentLoaded', () => {
         isTransitioning = true;
         currentIndex = index;
         
-        const cardWidth = allCards[0].offsetWidth + 30; // card width + gap
-        track.style.transition = transition ? 'transform 0.5s ease-in-out' : 'none';
-        track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+        track.style.transition = transition ? 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)' : 'none';
+        track.style.transform = `translateX(-${currentIndex * 100}%)`;
         
         updateDots(currentIndex);
     }
@@ -132,19 +131,20 @@ document.addEventListener('DOMContentLoaded', () => {
         isTransitioning = false;
         
         if (currentIndex === 0) {
-            goToSlide(cards.length, false);
+            goToSlide(originalCards.length, false);
         }
-        if (currentIndex === cards.length + 1) {
+        if (currentIndex === originalCards.length + 1) {
             goToSlide(1, false);
         }
     });
 
     // Auto slide
-    let autoSlideInterval = setInterval(() => {
-        goToSlide(currentIndex + 1);
+    setInterval(() => {
+        if (!document.hidden) {
+            goToSlide(currentIndex + 1);
+        }
     }, 5000);
 
     // Initial positioning
-    setTimeout(() => goToSlide(1, false), 100);
-    window.addEventListener('resize', () => goToSlide(currentIndex, false));
+    goToSlide(1, false);
 });
