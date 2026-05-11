@@ -82,27 +82,33 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!track || cards.length === 0) return;
 
     // Initialize Dots
-    dotsContainer.innerHTML = '';
-    const isDesktop = window.innerWidth > 992;
-    const numPages = isDesktop ? 2 : cards.length;
-    
-    for (let i = 0; i < numPages; i++) {
-        const dot = document.createElement('div');
-        dot.classList.add('dot');
-        if (i === 0) dot.classList.add('active');
-        dot.addEventListener('click', () => {
-            goToPage(i);
-            resetAutoPlay();
-        });
-        dotsContainer.appendChild(dot);
+    function initDots() {
+        dotsContainer.innerHTML = '';
+        const isDesktop = window.innerWidth > 992;
+        const numPages = isDesktop ? 2 : cards.length;
+        
+        for (let i = 0; i < numPages; i++) {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if (i === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => {
+                goToPage(i);
+                resetAutoPlay();
+            });
+            dotsContainer.appendChild(dot);
+        }
     }
 
-    const dots = document.querySelectorAll('.dot');
+    initDots();
+
     let currentPage = 0;
     let autoPlayInterval;
 
     function goToPage(page) {
-        currentPage = page;
+        const isDesktop = window.innerWidth > 992;
+        const numPages = isDesktop ? 2 : cards.length;
+        currentPage = page % numPages;
+
         const container = document.querySelector('.carousel-container');
         const containerWidth = container.offsetWidth;
         const cardWidth = cards[0].offsetWidth;
@@ -110,32 +116,37 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let offset = 0;
 
-        if (window.innerWidth > 992) {
-            // Desktop Group Sliding
-            if (page === 0) {
+        if (isDesktop) {
+            // Desktop Group Sliding (2 Pages)
+            if (currentPage === 0) {
                 offset = 0;
             } else {
-                // Center the 4th card (last card)
-                // Total distance to 4th card start = 3 cards + 3 gaps
+                // To center Card 4:
+                // card4CenterPos = (3 cards + 3 gaps) + cardWidth/2
                 const card4Start = 3 * (cardWidth + gap);
-                // Center it: card4Start - (container/2 - cardWidth/2)
-                offset = card4Start - (containerWidth / 2 - cardWidth / 2);
+                const card4Center = card4Start + (cardWidth / 2);
+                // Offset needed to put card4Center at containerWidth/2
+                offset = card4Center - (containerWidth / 2);
             }
         } else {
             // Mobile/Tablet Single Sliding
-            offset = page * (cardWidth + gap);
+            offset = currentPage * (cardWidth + gap);
         }
 
         track.style.transform = `translateX(-${offset}px)`;
         
         // Update Dots
+        const dots = document.querySelectorAll('.dot');
         dots.forEach((dot, index) => {
             dot.classList.toggle('active', index === currentPage);
         });
     }
 
     function startAutoPlay() {
+        stopAutoPlay();
         autoPlayInterval = setInterval(() => {
+            const isDesktop = window.innerWidth > 992;
+            const numPages = isDesktop ? 2 : cards.length;
             const nextPage = (currentPage + 1) % numPages;
             goToPage(nextPage);
         }, 4000);
@@ -163,9 +174,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
-            // Re-sync position without reload if possible, 
-            // but reload is safer for complex grid layouts
-            location.reload(); 
+            initDots();
+            goToPage(0); // Reset to start on resize for stability
         }, 250);
     });
 });
