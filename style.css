@@ -307,6 +307,9 @@ nav.scrolled {
   border-radius: 8px;
   overflow: hidden;
   transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .inventory-card:hover {
@@ -319,6 +322,7 @@ nav.scrolled {
   background-size: cover;
   background-position: center;
   position: relative;
+  flex-shrink: 0;
 }
 
 .inventory-year {
@@ -335,6 +339,13 @@ nav.scrolled {
 
 .inventory-info {
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.inventory-info .btn {
+  margin-top: auto;
 }
 
 .inventory-info h3 {
