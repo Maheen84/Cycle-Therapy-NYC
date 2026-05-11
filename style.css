@@ -430,8 +430,10 @@ nav.scrolled {
 
 .testimonial-card:hover {
   transform: translateY(-20px) !important;
-  box-shadow: 0 10px 30px rgba(232, 73, 29, 0.4);
-  border-color: #e8491d;
+  box-shadow: 0 10px 30px rgba(232, 73, 29, 0.4),
+              0 0 0 1px rgba(232, 73, 29, 0.6);
+  /* Use box-shadow for border glow — NOT border-color.
+     Changing border-color shifts layout; box-shadow does not. */
   animation-play-state: paused;
 }
 
@@ -455,22 +457,6 @@ nav.scrolled {
   display: flex;
   transition: transform 1.4s cubic-bezier(0.65, 0, 0.35, 1);
   gap: 30px;
-}
-
-.testimonial-card {
-  min-width: calc(33.333% - 20px);
-  background: #2a2a2a;
-  padding: 40px;
-  border-radius: 12px;
-  border: 1px solid #3a3a3a;
-  font-style: italic;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 280px;
-  position: relative;
-  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: floating 6s ease-in-out infinite;
 }
 
 /* Drifting Transition Effect — removed (conflicted with float animation) */
