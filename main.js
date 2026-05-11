@@ -72,3 +72,43 @@ if (contactForm) {
         }, 100);
     });
 }
+
+// Testimonials Carousel
+document.addEventListener('DOMContentLoaded', () => {
+    const track = document.querySelector('.carousel-track');
+    const cards = document.querySelectorAll('.testimonial-card');
+    const dotsContainer = document.querySelector('.carousel-dots');
+    
+    if (!track || cards.length === 0) return;
+
+    let currentIndex = 0;
+
+    // Create dots
+    cards.forEach((_, i) => {
+        const dot = document.createElement('div');
+        dot.classList.add('dot');
+        if (i === 0) dot.classList.add('active');
+        dot.addEventListener('click', () => goToSlide(i));
+        dotsContainer.appendChild(dot);
+    });
+
+    const dots = document.querySelectorAll('.dot');
+
+    function goToSlide(index) {
+        currentIndex = index;
+        const cardWidth = cards[0].offsetWidth + 30; // card width + gap
+        track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+        
+        dots.forEach(dot => dot.classList.remove('active'));
+        if (dots[currentIndex]) dots[currentIndex].classList.add('active');
+    }
+
+    // Auto slide
+    let autoSlideInterval = setInterval(() => {
+        currentIndex = (currentIndex + 1) % cards.length;
+        goToSlide(currentIndex);
+    }, 5000);
+
+    // Initial positioning
+    window.addEventListener('resize', () => goToSlide(currentIndex));
+});
