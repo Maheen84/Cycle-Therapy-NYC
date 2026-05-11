@@ -403,20 +403,18 @@ nav.scrolled {
 
 .testimonial-card {
   min-width: calc(33.333% - 20px);
-  flex-shrink: 0;                         /* never let flex resize the card */
-  /* Glassmorphism Dark Card */
-  background: rgba(42, 42, 42, 0.65);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  width: calc(33.333% - 20px);            /* force equal width */
+  height: 300px;                          /* fixed height, roughly square-ish */
+  flex-shrink: 0;
+  background: #2a2a2a;                    /* solid dark background */
   padding: 40px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08); /* Subtle glass border */
   font-style: italic;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 280px;
   position: relative;
+  overflow: hidden;                       /* clip overflow if text is too long */
   will-change: transform;
   transition: transform 0.3s ease;
 }
@@ -427,9 +425,14 @@ nav.scrolled {
 
 .testimonial-card p {
   color: white;
-  font-size: 1.05rem;
+  font-size: 15px;                        /* requested font size */
   line-height: 1.6;
   pointer-events: none;
+  overflow: hidden;                       /* handle overflow */
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 6;                  /* clip after ~6 lines */
+  -webkit-box-orient: vertical;
 }
 
 .testimonial-author {
