@@ -73,92 +73,105 @@ if (contactForm) {
     });
 }
 
-// ─── Anti-Gravity Testimonials Carousel ───────────────────────────────────────
-// Note: <script type="module"> is already deferred, so we don't need
-// DOMContentLoaded. Instead we use a simple init guard.
+// ─── Anti-Gravity Testimonials Carousel (Infinite Clone Loop) ─────────────────
 (function initCarousel() {
-    const track        = document.querySelector('.carousel-track');
-    const dotsWrap     = document.querySelector('.carousel-dots');
+    const track    = document.querySelector('.carousel-track');
+    const dotsWrap = document.querySelector('.carousel-dots');
     if (!track || !dotsWrap) return;
 
-    const cards        = Array.from(track.querySelectorAll('.testimonial-card'));
-    if (cards.length === 0) return;
+    // Original cards (3 reviews)
+    const originals = Array.from(track.querySelectorAll('.testimonial-card'));
+    if (originals.length === 0) return;
 
-    // ── State ──────────────────────────────────────────────────────────────────
-    let current  = 0;   // current page index
-    let timer    = null;
-    const GAP    = 30;  // matches CSS gap
+    const N   = originals.length; // 3
+    const GAP = 30;
 
-    // ── Helpers ────────────────────────────────────────────────────────────────
-    function numPages() {
-        return window.innerWidth > 992 ? 2 : cards.length;
+    // ── Clone cards and append for seamless loop ──────────────────────────────
+    originals.forEach(card => {
+        const clone = card.cloneNode(true);
+        clone.setAttribute('aria-hidden', 'true');
+        track.appendChild(clone);
+    });
+    // track now has N * 2 = 6 cards  →  [1,2,3, clone1,clone2,clone3]
+
+    // ── State ─────────────────────────────────────────────────────────────────
+    let current   = 0;   // logical index: 0 = card 1 is leftmost visible
+    let timer     = null;
+    let jumping   = false;
+
+    // ── Slide to a position (index = which card is leftmost) ─────────────────
+    function slideTo(idx, animate) {
+        const cardW = originals[0].getBoundingClientRect().width;
+        const step  = cardW + GAP;
+
+        track.style.transition = animate
+            ? 'transform 1.4s cubic-bezier(0.65, 0, 0.35, 1)'
+            : 'none';
+        track.style.transform  = `translateX(-${idx * step}px)`;
+        current = idx;
+
+        // Update dots (mod N so clones map back to originals)
+        const dotIdx = ((idx % N) + N) % N;
+        document.querySelectorAll('.dot').forEach((d, i) =>
+            d.classList.toggle('active', i === dotIdx)
+        );
     }
 
-    function slideTo(page) {
-        const pages = numPages();
-        current = ((page % pages) + pages) % pages;   // safe modulo
-
-        const cardW       = cards[0].getBoundingClientRect().width;
-        const containerW  = track.parentElement.offsetWidth;
-        let offset = 0;
-
-        if (window.innerWidth > 992) {
-            if (current === 0) {
-                offset = 0;
-            } else {
-                // Center the 4th card in the viewport
-                const card4Left = 3 * (cardW + GAP);
-                offset = card4Left - (containerW / 2 - cardW / 2);
-            }
-        } else {
-            offset = current * (cardW + GAP);
+    // After sliding to a clone position, silently jump back to the real card
+    track.addEventListener('transitionend', () => {
+        if (jumping) return;
+        if (current >= N) {
+            jumping = true;
+            slideTo(current - N, false);
+            // Allow one tick for the non-animated jump to settle
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+                jumping = false;
+            }));
         }
+    });
 
-        track.style.transform = `translateX(-${offset}px)`;
-
-        // Update dots
-        document.querySelectorAll('.dot').forEach((d, i) => {
-            d.classList.toggle('active', i === current);
+    // ── Dots (one per original card) ──────────────────────────────────────────
+    function buildDots() {
+        dotsWrap.innerHTML = '';
+        originals.forEach((_, i) => {
+            const d = document.createElement('div');
+            d.className = 'dot' + (i === 0 ? ' active' : '');
+            d.addEventListener('click', () => {
+                // Find position of that original card relative to current
+                // and slide to a position that shows it correctly
+                const target = ((i - (current % N)) + N) % N;
+                slideTo(current + target, true);
+                resetTimer();
+            });
+            dotsWrap.appendChild(d);
         });
     }
 
-    // ── Dots ───────────────────────────────────────────────────────────────────
-    function buildDots() {
-        dotsWrap.innerHTML = '';
-        for (let i = 0; i < numPages(); i++) {
-            const d = document.createElement('div');
-            d.className = 'dot' + (i === 0 ? ' active' : '');
-            d.addEventListener('click', () => { slideTo(i); resetTimer(); });
-            dotsWrap.appendChild(d);
-        }
-    }
-
-    // ── Auto-play ──────────────────────────────────────────────────────────────
+    // ── Auto-play ─────────────────────────────────────────────────────────────
     function startTimer() {
         stopTimer();
-        timer = setInterval(() => slideTo(current + 1), 4000);
+        timer = setInterval(() => {
+            if (!jumping) slideTo(current + 1, true);
+        }, 5000);   // 5s interval + 1.4s transition = smooth & readable
     }
 
-    function stopTimer() {
-        if (timer) { clearInterval(timer); timer = null; }
-    }
-
+    function stopTimer()  { if (timer) { clearInterval(timer); timer = null; } }
     function resetTimer() { stopTimer(); startTimer(); }
 
-    // ── Hover pause ────────────────────────────────────────────────────────────
+    // ── Hover pause ───────────────────────────────────────────────────────────
     const container = document.querySelector('.carousel-container');
     container.addEventListener('mouseenter', stopTimer);
     container.addEventListener('mouseleave', startTimer);
 
-    // ── Boot ───────────────────────────────────────────────────────────────────
+    // ── Boot ──────────────────────────────────────────────────────────────────
     buildDots();
-    slideTo(0);
+    slideTo(0, false);
     startTimer();
 
-    // Rebuild on resize (debounced)
+    // Resize: recalculate offset without rebuilding
     let resizeTO;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTO);
-        resizeTO = setTimeout(() => { buildDots(); slideTo(0); }, 300);
+        resizeTO = setTimeout(() => slideTo(current, false), 300);
     });
 }());
