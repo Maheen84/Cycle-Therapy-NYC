@@ -81,7 +81,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (!track || cards.length === 0) return;
 
-    // Initialize Dots
+    let currentPage = 0;
+    let autoPlayInterval;
+    let isTransitioning = false;
+
     function initDots() {
         dotsContainer.innerHTML = '';
         const isDesktop = window.innerWidth > 992;
@@ -92,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
             dot.classList.add('dot');
             if (i === 0) dot.classList.add('active');
             dot.addEventListener('click', () => {
+                if (isTransitioning) return;
                 goToPage(i);
                 resetAutoPlay();
             });
@@ -99,61 +103,75 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    initDots();
-
-    let currentPage = 0;
-    let autoPlayInterval;
-
     function goToPage(page) {
+        if (isTransitioning) return;
+        isTransitioning = true;
+        
         const isDesktop = window.innerWidth > 992;
         const numPages = isDesktop ? 2 : cards.length;
         currentPage = page % numPages;
 
-        const container = document.querySelector('.carousel-container');
-        const containerWidth = container.offsetWidth;
-        const cardWidth = cards[0].offsetWidth;
-        const gap = 30;
+        // Start Drift Transition (Float up and fade out)
+        track.classList.add('transitioning');
         
-        let offset = 0;
+        setTimeout(() => {
+            const container = document.querySelector('.carousel-container');
+            const containerWidth = container.offsetWidth;
+            const cardWidth = cards[0].offsetWidth;
+            const gap = 30;
+            
+            let offset = 0;
 
-        if (isDesktop) {
-            // Desktop Group Sliding (2 Pages)
-            if (currentPage === 0) {
-                offset = 0;
+            if (isDesktop) {
+                // Update Page Classes for Visibility
+                track.classList.remove('page-1-active', 'page-2-active');
+                track.classList.add(currentPage === 0 ? 'page-1-active' : 'page-2-active');
+
+                if (currentPage === 0) {
+                    offset = 0;
+                } else {
+                    const card4Start = 3 * (cardWidth + gap);
+                    const card4Center = card4Start + (cardWidth / 2);
+                    offset = card4Center - (containerWidth / 2);
+                }
             } else {
-                // To center Card 4:
-                // card4CenterPos = (3 cards + 3 gaps) + cardWidth/2
-                const card4Start = 3 * (cardWidth + gap);
-                const card4Center = card4Start + (cardWidth / 2);
-                // Offset needed to put card4Center at containerWidth/2
-                offset = card4Center - (containerWidth / 2);
+                offset = currentPage * (cardWidth + gap);
             }
-        } else {
-            // Mobile/Tablet Single Sliding
-            offset = currentPage * (cardWidth + gap);
-        }
 
-        track.style.transform = `translateX(-${offset}px)`;
-        
-        // Update Dots
-        const dots = document.querySelectorAll('.dot');
-        dots.forEach((dot, index) => {
-            dot.classList.toggle('active', index === currentPage);
-        });
+            track.style.transform = `translateX(-${offset}px)`;
+            
+            // Finish Drift Transition (Drift down)
+            track.classList.remove('transitioning');
+            track.classList.add('drifting-down');
+
+            // Update Dots
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentPage);
+            });
+
+            setTimeout(() => {
+                track.classList.remove('drifting-down');
+                isTransitioning = false;
+            }, 600);
+        }, 400);
     }
 
     function startAutoPlay() {
-        stopAutoPlay();
+        if (autoPlayInterval) clearInterval(autoPlayInterval);
         autoPlayInterval = setInterval(() => {
+            if (isTransitioning) return;
             const isDesktop = window.innerWidth > 992;
             const numPages = isDesktop ? 2 : cards.length;
-            const nextPage = (currentPage + 1) % numPages;
-            goToPage(nextPage);
+            goToPage((currentPage + 1) % numPages);
         }, 4000);
     }
 
     function stopAutoPlay() {
-        clearInterval(autoPlayInterval);
+        if (autoPlayInterval) {
+            clearInterval(autoPlayInterval);
+            autoPlayInterval = null;
+        }
     }
 
     function resetAutoPlay() {
@@ -161,12 +179,19 @@ document.addEventListener('DOMContentLoaded', () => {
         startAutoPlay();
     }
 
-    // Hover logic
+    // Hover logic - Use the container to ensure it covers the whole area
     const container = document.querySelector('.carousel-container');
-    container.addEventListener('mouseenter', stopAutoPlay);
-    container.addEventListener('mouseleave', startAutoPlay);
+    container.addEventListener('mouseenter', () => {
+        stopAutoPlay();
+    });
+    
+    container.addEventListener('mouseleave', () => {
+        startAutoPlay();
+    });
 
     // Initial Start
+    initDots();
+    track.classList.add('page-1-active');
     startAutoPlay();
 
     // Handle Resize
@@ -174,8 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
-            initDots();
-            goToPage(0); // Reset to start on resize for stability
+            location.reload(); // Reload is necessary to recalculate offsets properly
         }, 250);
     });
 });
