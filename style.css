@@ -414,10 +414,10 @@ nav.scrolled {
   justify-content: space-between;
   min-height: 280px;
   position: relative;
-  will-change: transform, translate, box-shadow; /* GPU layer */
-  translate: 0 0;
-  /* Transition translate instead of transform to not conflict with animation */
-  transition: translate 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+  will-change: transform, top, box-shadow; /* GPU layer */
+  top: 0;
+  /* Transition 'top' instead of 'transform' to not conflict with animation */
+  transition: top 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
   animation: floating 6s ease-in-out infinite;
 }
 
@@ -433,7 +433,7 @@ nav.scrolled {
 }
 
 .testimonial-card:hover {
-  translate: 0 -20px;
+  top: -20px;
   box-shadow: 0 10px 30px rgba(232, 73, 29, 0.4);
   border-color: #e8491d;
 }
