@@ -73,11 +73,10 @@ if (contactForm) {
     });
 }
 
-// ─── Anti-Gravity Testimonials Carousel (Infinite Clone Loop) ─────────────────
+// ─── Anti-Gravity Testimonials Carousel (Silent Infinite Loop) ────────────────
 (function initCarousel() {
-    const track    = document.querySelector('.carousel-track');
-    const dotsWrap = document.querySelector('.carousel-dots');
-    if (!track || !dotsWrap) return;
+    const track = document.querySelector('.carousel-track');
+    if (!track) return;
 
     // Original cards (3 reviews)
     const originals = Array.from(track.querySelectorAll('.testimonial-card'));
@@ -86,77 +85,52 @@ if (contactForm) {
     const N   = originals.length; // 3
     const GAP = 30;
 
-    // ── Clone cards and append for seamless loop ──────────────────────────────
+    // ── Clone all cards and append for seamless loop ───────────────────────────
+    // Track becomes: [1, 2, 3, clone1, clone2, clone3]
     originals.forEach(card => {
         const clone = card.cloneNode(true);
         clone.setAttribute('aria-hidden', 'true');
         track.appendChild(clone);
     });
-    // track now has N * 2 = 6 cards  →  [1,2,3, clone1,clone2,clone3]
 
     // ── State ─────────────────────────────────────────────────────────────────
-    let current   = 0;   // logical index: 0 = card 1 is leftmost visible
-    let timer     = null;
-    let jumping   = false;
+    let current = 0;
+    let timer   = null;
+    let jumping = false;
 
-    // ── Slide to a position (index = which card is leftmost) ─────────────────
+    // ── Slide to card index ───────────────────────────────────────────────────
     function slideTo(idx, animate) {
         const cardW = originals[0].getBoundingClientRect().width;
-        const step  = cardW + GAP;
-
         track.style.transition = animate
             ? 'transform 1.4s cubic-bezier(0.65, 0, 0.35, 1)'
             : 'none';
-        track.style.transform  = `translateX(-${idx * step}px)`;
+        track.style.transform = `translateX(-${idx * (cardW + GAP)}px)`;
         current = idx;
-
-        // Update dots (mod N so clones map back to originals)
-        const dotIdx = ((idx % N) + N) % N;
-        document.querySelectorAll('.dot').forEach((d, i) =>
-            d.classList.toggle('active', i === dotIdx)
-        );
     }
 
-    // After sliding to a clone position, silently jump back to the real card
+    // After each animated slide, if we've hit a clone, silently jump back
     track.addEventListener('transitionend', () => {
         if (jumping) return;
         if (current >= N) {
             jumping = true;
             slideTo(current - N, false);
-            // Allow one tick for the non-animated jump to settle
             requestAnimationFrame(() => requestAnimationFrame(() => {
                 jumping = false;
             }));
         }
     });
 
-    // ── Dots (one per original card) ──────────────────────────────────────────
-    function buildDots() {
-        dotsWrap.innerHTML = '';
-        originals.forEach((_, i) => {
-            const d = document.createElement('div');
-            d.className = 'dot' + (i === 0 ? ' active' : '');
-            d.addEventListener('click', () => {
-                // Find position of that original card relative to current
-                // and slide to a position that shows it correctly
-                const target = ((i - (current % N)) + N) % N;
-                slideTo(current + target, true);
-                resetTimer();
-            });
-            dotsWrap.appendChild(d);
-        });
-    }
-
-    // ── Auto-play ─────────────────────────────────────────────────────────────
+    // ── Auto-play: advance one card every 4 seconds ───────────────────────────
     function startTimer() {
         stopTimer();
         timer = setInterval(() => {
             if (!jumping) slideTo(current + 1, true);
-        }, 5000);   // 5s interval + 1.4s transition = smooth & readable
+        }, 4000);
     }
 
-    function stopTimer()  { if (timer) { clearInterval(timer); timer = null; } }
-    function resetTimer() { stopTimer(); startTimer(); }
+    function stopTimer() {
+        if (timer) { clearInterval(timer); timer = null; }
+    }
 
     // ── Hover pause ───────────────────────────────────────────────────────────
     const container = document.querySelector('.carousel-container');
@@ -164,11 +138,10 @@ if (contactForm) {
     container.addEventListener('mouseleave', startTimer);
 
     // ── Boot ──────────────────────────────────────────────────────────────────
-    buildDots();
     slideTo(0, false);
     startTimer();
 
-    // Resize: recalculate offset without rebuilding
+    // Re-sync offset on resize
     let resizeTO;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTO);
