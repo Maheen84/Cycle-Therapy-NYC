@@ -395,13 +395,14 @@ nav.scrolled {
 
 .carousel-wrapper {
   overflow: hidden;
-  width: 100%;
-  padding: 40px 0;
+  margin: -15px;
+  padding: 15px;
+  padding-top: 40px;
+  padding-bottom: 40px;
 }
 
 .carousel-container {
-  margin: -12px;
-  padding: 12px;
+  /* inner container needs no layout shifts now */
 }
 
 .carousel-track {
