@@ -397,12 +397,13 @@ nav.scrolled {
 
 .carousel-track {
   display: flex;
-  transition: all 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Drift effect */
+  transition: transform 1.4s cubic-bezier(0.65, 0, 0.35, 1);
   gap: 30px;
 }
 
 .testimonial-card {
   min-width: calc(33.333% - 20px);
+  flex-shrink: 0;                         /* never let flex resize the card */
   background: #2a2a2a;
   padding: 40px;
   border-radius: 12px;
@@ -413,7 +414,10 @@ nav.scrolled {
   justify-content: space-between;
   min-height: 280px;
   position: relative;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;                 /* GPU layer — prevents repaint flicker */
+  /* Only transition the two properties we actually change on hover.
+     'transition: all' is banned — it causes layout-affecting props to animate. */
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
   animation: floating 6s ease-in-out infinite;
 }
 
@@ -430,11 +434,10 @@ nav.scrolled {
 
 .testimonial-card:hover {
   transform: translateY(-20px) !important;
-  box-shadow: 0 10px 30px rgba(232, 73, 29, 0.4),
-              0 0 0 1px rgba(232, 73, 29, 0.6);
-  /* Use box-shadow for border glow — NOT border-color.
-     Changing border-color shifts layout; box-shadow does not. */
-  animation-play-state: paused;
+  box-shadow: 0 15px 35px rgba(232, 73, 29, 0.35),
+              0 0 0 1px rgba(232, 73, 29, 0.5);
+  /* No animation-play-state:paused — pausing mid-float caused a jump.
+     The !important transform already overrides the float animation smoothly. */
 }
 
 .testimonial-card p {
@@ -452,12 +455,7 @@ nav.scrolled {
   letter-spacing: 0.1em;
 }
 
-/* Smooth Horizontal Slide with Drift */
-.carousel-track {
-  display: flex;
-  transition: transform 1.4s cubic-bezier(0.65, 0, 0.35, 1);
-  gap: 30px;
-}
+
 
 /* Drifting Transition Effect — removed (conflicted with float animation) */
 
