@@ -402,6 +402,7 @@ nav.scrolled {
 
 .testimonial-card {
   min-width: calc(33.333% - 20px);
+  flex-shrink: 0;
   background: var(--glass);
   padding: 40px;
   border-radius: 8px;

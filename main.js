@@ -73,42 +73,78 @@ if (contactForm) {
     });
 }
 
-// Testimonials Carousel
+// Testimonials Carousel (Infinite Loop)
 document.addEventListener('DOMContentLoaded', () => {
     const track = document.querySelector('.carousel-track');
-    const cards = document.querySelectorAll('.testimonial-card');
+    const cards = Array.from(document.querySelectorAll('.testimonial-card'));
     const dotsContainer = document.querySelector('.carousel-dots');
     
     if (!track || cards.length === 0) return;
 
-    let currentIndex = 0;
+    // Clone first and last cards for seamless loop
+    const firstClone = cards[0].cloneNode(true);
+    const lastClone = cards[cards.length - 1].cloneNode(true);
+    
+    track.appendChild(firstClone);
+    track.insertBefore(lastClone, cards[0]);
 
-    // Create dots
+    const allCards = document.querySelectorAll('.testimonial-card');
+    let currentIndex = 1; // Start at the first original card
+    let isTransitioning = false;
+
+    // Create dots (only for original cards)
     cards.forEach((_, i) => {
         const dot = document.createElement('div');
         dot.classList.add('dot');
         if (i === 0) dot.classList.add('active');
-        dot.addEventListener('click', () => goToSlide(i));
+        dot.addEventListener('click', () => {
+            if (isTransitioning) return;
+            goToSlide(i + 1);
+        });
         dotsContainer.appendChild(dot);
     });
 
     const dots = document.querySelectorAll('.dot');
 
-    function goToSlide(index) {
-        currentIndex = index;
-        const cardWidth = cards[0].offsetWidth + 30; // card width + gap
-        track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+    function updateDots(index) {
+        let dotIndex = index - 1;
+        if (index === 0) dotIndex = cards.length - 1;
+        if (index === cards.length + 1) dotIndex = 0;
         
         dots.forEach(dot => dot.classList.remove('active'));
-        if (dots[currentIndex]) dots[currentIndex].classList.add('active');
+        if (dots[dotIndex]) dots[dotIndex].classList.add('active');
     }
+
+    function goToSlide(index, transition = true) {
+        if (isTransitioning && transition) return;
+        
+        isTransitioning = true;
+        currentIndex = index;
+        
+        const cardWidth = allCards[0].offsetWidth + 30; // card width + gap
+        track.style.transition = transition ? 'transform 0.5s ease-in-out' : 'none';
+        track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+        
+        updateDots(currentIndex);
+    }
+
+    track.addEventListener('transitionend', () => {
+        isTransitioning = false;
+        
+        if (currentIndex === 0) {
+            goToSlide(cards.length, false);
+        }
+        if (currentIndex === cards.length + 1) {
+            goToSlide(1, false);
+        }
+    });
 
     // Auto slide
     let autoSlideInterval = setInterval(() => {
-        currentIndex = (currentIndex + 1) % cards.length;
-        goToSlide(currentIndex);
+        goToSlide(currentIndex + 1);
     }, 5000);
 
     // Initial positioning
-    window.addEventListener('resize', () => goToSlide(currentIndex));
+    setTimeout(() => goToSlide(1, false), 100);
+    window.addEventListener('resize', () => goToSlide(currentIndex, false));
 });
