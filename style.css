@@ -388,11 +388,20 @@ nav.scrolled {
 }
 
 /* Anti-Gravity Testimonials Carousel */
-.carousel-container {
-  overflow: hidden;
+.carousel-outer-wrapper {
   position: relative;
   width: 100%;
-  padding: 40px 0; /* Space for floating cards */
+}
+
+.carousel-wrapper {
+  overflow: hidden;
+  width: 100%;
+  padding: 40px 0;
+}
+
+.carousel-container {
+  margin: -12px;
+  padding: 12px;
 }
 
 .carousel-track {
@@ -449,14 +458,37 @@ nav.scrolled {
 
 
 
-/* Drifting Transition Effect — removed (conflicted with float animation) */
-
-.carousel-dots {
+.carousel-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #2a2a2a;
+  border: 1px solid #e8491d;
+  color: #e8491d;
   display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 15px;
-  margin-top: 50px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
 }
+
+.carousel-btn:hover {
+  background: #e8491d;
+  color: #fff;
+}
+
+.prev-btn {
+  left: -60px;
+}
+
+.next-btn {
+  right: -60px;
+}
+
 
 .dot {
   width: 12px;

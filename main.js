@@ -128,6 +128,37 @@ if (contactForm) {
         }
     });
 
+    // ── Button Controls ───────────────────────────────────────────────────────
+    const prevBtn = document.querySelector('.prev-btn');
+    const nextBtn = document.querySelector('.next-btn');
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            if (isJumping) return;
+            if (current <= 0) {
+                // Silently jump to the cloned set on the right
+                isJumping = true;
+                goTo(N, false);
+                // Then animate one step to the left
+                requestAnimationFrame(() => requestAnimationFrame(() => {
+                    isJumping = false;
+                    goTo(N - 1, true);
+                }));
+            } else {
+                goTo(current - 1, true);
+            }
+            resetTimer();
+        });
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            if (isJumping) return;
+            goTo(current + 1, true);
+            resetTimer();
+        });
+    }
+
     // ── Auto-play ─────────────────────────────────────────────────────────────
     function startTimer() {
         stopTimer();
@@ -140,10 +171,17 @@ if (contactForm) {
         if (timer) { clearInterval(timer); timer = null; }
     }
 
+    function resetTimer() {
+        stopTimer();
+        startTimer();
+    }
+
     // ── Hover pause ───────────────────────────────────────────────────────────
-    const container = document.querySelector('.carousel-container');
-    container.addEventListener('mouseenter', stopTimer);
-    container.addEventListener('mouseleave', startTimer);
+    const container = document.querySelector('.carousel-outer-wrapper');
+    if (container) {
+        container.addEventListener('mouseenter', stopTimer);
+        container.addEventListener('mouseleave', startTimer);
+    }
 
     // ── Boot ──────────────────────────────────────────────────────────────────
     goTo(0, false);
