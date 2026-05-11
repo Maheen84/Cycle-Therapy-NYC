@@ -403,41 +403,41 @@ nav.scrolled {
 
 .testimonial-card {
   min-width: calc(33.333% - 20px);
-  background: #1a1a1a;
+  background: #2a2a2a;
   padding: 40px;
   border-radius: 12px;
-  border: 1px solid var(--border);
+  border: 1px solid #3a3a3a;
   font-style: italic;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   min-height: 280px;
   position: relative;
-  transition: all 0.4s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   animation: floating 6s ease-in-out infinite;
 }
 
 /* Individual floating offsets */
 .testimonial-card:nth-child(1) { animation-delay: 0s; }
-.testimonial-card:nth-child(2) { animation-delay: 1.5s; }
-.testimonial-card:nth-child(3) { animation-delay: 3s; }
-.testimonial-card:nth-child(4) { animation-delay: 4.5s; }
+.testimonial-card:nth-child(2) { animation-delay: 1.2s; }
+.testimonial-card:nth-child(3) { animation-delay: 2.4s; }
+.testimonial-card:nth-child(4) { animation-delay: 3.6s; }
 
 @keyframes floating {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-15px); }
+  50% { transform: translateY(-12px); }
 }
 
 .testimonial-card:hover {
-  transform: translateY(-25px) !important;
-  box-shadow: 0 10px 30px rgba(232, 73, 29, 0.3);
+  transform: translateY(-20px) !important;
+  box-shadow: 0 10px 30px rgba(232, 73, 29, 0.4);
   border-color: #e8491d;
   animation-play-state: paused;
 }
 
 .testimonial-card p {
   color: white;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   line-height: 1.6;
 }
 
@@ -450,10 +450,11 @@ nav.scrolled {
   letter-spacing: 0.1em;
 }
 
-/* Transition effects */
-.carousel-track.transitioning .testimonial-card {
-  opacity: 0;
-  transform: translateY(-50px);
+/* Smooth Horizontal Slide */
+.carousel-track {
+  display: flex;
+  transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+  gap: 30px;
 }
 
 @media (max-width: 992px) {

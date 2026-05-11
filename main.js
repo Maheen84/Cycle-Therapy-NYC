@@ -73,7 +73,7 @@ if (contactForm) {
     });
 }
 
-// Anti-Gravity Testimonials Carousel (Group Paging)
+// Anti-Gravity Testimonials Carousel (Group Sliding)
 document.addEventListener('DOMContentLoaded', () => {
     const track = document.querySelector('.carousel-track');
     const cards = Array.from(document.querySelectorAll('.testimonial-card'));
@@ -81,65 +81,60 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (!track || cards.length === 0) return;
 
-    // Reset dots
+    // Initialize Dots
     dotsContainer.innerHTML = '';
-    const numPages = window.innerWidth > 992 ? 2 : cards.length;
+    const isDesktop = window.innerWidth > 992;
+    const numPages = isDesktop ? 2 : cards.length;
     
     for (let i = 0; i < numPages; i++) {
         const dot = document.createElement('div');
         dot.classList.add('dot');
         if (i === 0) dot.classList.add('active');
-        dot.addEventListener('click', () => goToPage(i));
+        dot.addEventListener('click', () => {
+            goToPage(i);
+            resetAutoPlay();
+        });
         dotsContainer.appendChild(dot);
     }
 
     const dots = document.querySelectorAll('.dot');
     let currentPage = 0;
-    let isTransitioning = false;
     let autoPlayInterval;
 
     function goToPage(page) {
-        if (isTransitioning) return;
-        isTransitioning = true;
         currentPage = page;
-
-        // Transition effect (float up and fade out)
-        track.classList.add('transitioning');
+        const container = document.querySelector('.carousel-container');
+        const containerWidth = container.offsetWidth;
+        const cardWidth = cards[0].offsetWidth;
+        const gap = 30;
         
-        setTimeout(() => {
-            const cardWidth = cards[0].offsetWidth;
-            const gap = 30;
-            let offset;
+        let offset = 0;
 
-            if (window.innerWidth > 992) {
-                // Desktop: Page 0 = cards 1-3, Page 1 = card 4 centered
-                if (page === 0) {
-                    offset = 0;
-                } else {
-                    // Center the last card
-                    const containerWidth = document.querySelector('.carousel-container').offsetWidth;
-                    offset = (cardWidth * 3 + gap * 3) - (containerWidth / 2 - cardWidth / 2);
-                }
+        if (window.innerWidth > 992) {
+            // Desktop Group Sliding
+            if (page === 0) {
+                offset = 0;
             } else {
-                // Mobile/Tablet: 1 card at a time
-                offset = page * (cardWidth + gap);
+                // Center the 4th card (last card)
+                // Total distance to 4th card start = 3 cards + 3 gaps
+                const card4Start = 3 * (cardWidth + gap);
+                // Center it: card4Start - (container/2 - cardWidth/2)
+                offset = card4Start - (containerWidth / 2 - cardWidth / 2);
             }
+        } else {
+            // Mobile/Tablet Single Sliding
+            offset = page * (cardWidth + gap);
+        }
 
-            track.style.transform = `translateX(-${offset}px)`;
-            
-            // Update dots
-            dots.forEach(dot => dot.classList.remove('active'));
-            if (dots[currentPage]) dots[currentPage].classList.add('active');
-
-            setTimeout(() => {
-                track.classList.remove('transitioning');
-                isTransitioning = false;
-            }, 400);
-        }, 400);
+        track.style.transform = `translateX(-${offset}px)`;
+        
+        // Update Dots
+        dots.forEach((dot, index) => {
+            dot.classList.toggle('active', index === currentPage);
+        });
     }
 
     function startAutoPlay() {
-        stopAutoPlay();
         autoPlayInterval = setInterval(() => {
             const nextPage = (currentPage + 1) % numPages;
             goToPage(nextPage);
@@ -150,17 +145,27 @@ document.addEventListener('DOMContentLoaded', () => {
         clearInterval(autoPlayInterval);
     }
 
-    // Initial state
-    startAutoPlay();
+    function resetAutoPlay() {
+        stopAutoPlay();
+        startAutoPlay();
+    }
 
-    // Pause on hover
+    // Hover logic
     const container = document.querySelector('.carousel-container');
     container.addEventListener('mouseenter', stopAutoPlay);
     container.addEventListener('mouseleave', startAutoPlay);
 
-    // Responsive update
+    // Initial Start
+    startAutoPlay();
+
+    // Handle Resize
+    let resizeTimer;
     window.addEventListener('resize', () => {
-        // Simple refresh for demo purposes
-        location.reload(); 
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            // Re-sync position without reload if possible, 
+            // but reload is safer for complex grid layouts
+            location.reload(); 
+        }, 250);
     });
 });
